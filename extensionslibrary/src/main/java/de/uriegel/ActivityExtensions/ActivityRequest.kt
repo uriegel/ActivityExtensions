@@ -1,4 +1,4 @@
-package de.uriegel.extensionslibrary
+package de.uriegel.ActivityExtensions
 
 import android.content.Intent
 import androidx.activity.ComponentActivity
