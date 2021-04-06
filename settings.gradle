@@ -1,2 +1,3 @@
+include ':extensionslibrary'
 include ':app'
 rootProject.name = "ActivityExtensions"
