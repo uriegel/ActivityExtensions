@@ -25,7 +25,14 @@ suspend fun getString(urlString: String): String {
         val connection = url.openConnection() as HttpURLConnection
         connection.setRequestProperty("Accept-Encoding", "gzip")
         connection.connect()
-        val inStream = GZIPInputStream(connection.inputStream)
+        val result = connection.responseCode
+        if (result != 200)
+            throw java.lang.Exception("$result ${connection.responseMessage}")
+        val inStream =
+            if (connection.contentEncoding == "gzip")
+                GZIPInputStream(connection.inputStream)
+            else
+                connection.inputStream
         return@withContext readStream(inStream)
     }
 }
@@ -41,11 +48,20 @@ suspend fun post(urlString: String, data: String, psk: String?): String {
         connection.requestMethod = "POST"
         if (psk != null)
             connection.setRequestProperty("X-Auth-PSK", psk)
+        connection.setRequestProperty("Accept-Encoding", "gzip")
         connection.doInput = true
         val writer = BufferedWriter(OutputStreamWriter(connection.outputStream))
         writer.write(data)
         writer.close()
-        return@withContext readStream(connection.inputStream)
+        val result = connection.responseCode
+        if (result != 200)
+            throw java.lang.Exception("$result ${connection.responseMessage}")
+        val inStream =
+            if (connection.contentEncoding == "gzip")
+                GZIPInputStream(connection.inputStream)
+            else
+                connection.inputStream
+        return@withContext readStream(inStream)
     }
 }
 
